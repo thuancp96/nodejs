@@ -1,0 +1,75 @@
+<div class="form-add-users">
+  <div class="form-header">
+    <% if (Object.keys(errors).length === 0) { %>
+    <h2><%= data.type %> Book</h2>
+    <% } else { %>
+    <h2 class="errors-heading">Oops, please correct the following:</h2>
+    <ul class="errors-list">
+      <% Object.values(errors).forEach(error => { %>
+      <li><%= error.message %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </div>
+
+  <form id="form-add-user" method="post" action="<%= data.url %> " novalidate>
+    <div class="form-field <%= errors.name ? 'form-field-invalid' : '' %>">
+      <label for="name">Name </label>
+      <input
+        class="input"
+        type="text"
+        id="name"
+        name="name"
+        value="<%= data?.user?.name %>"
+        autofocus
+      />
+      <%= data.name %> <% if (errors.name) { %>
+      <div class="error"><%= errors.name.message %></div>
+      <% } %>
+    </div>
+    <div class="form-field <%= errors.gender ? 'form-field-invalid' : '' %>">
+      <label for="email">Gender</label>
+      <div class="custom-control custom-radio">
+        <input type="radio" id="customRadio1" name="gender" value="true"
+        class="custom-control-input" <%= data?.user?.gender ? 'checked' : '' %>
+        />
+        <label class="custom-control-label" for="customRadio1">male</label>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" id="customRadio2" name="gender"
+        class="custom-control-input" value="false" <%= data?.user?.gender ==
+        false ? 'checked' : '' %> />
+        <label class="custom-control-label" for="customRadio2">female</label>
+      </div>
+      <%= errors.gender %> <% if (errors.gender) { %>
+      <div class="error"><%= errors.gender.message %></div>
+      <% } %>
+      <!-- <input type="radio" name="gender" value="false" /> female -->
+    </div>
+    <div class="form-field <%= errors.birthdate ? 'form-field-invalid' : '' %>">
+      <label for="birthdate">Birth date</label>
+      <input
+        class="input"
+        type="text"
+        id="birthdate"
+        name="birthdate"
+        autofocus
+        value="<%= data?.user?.birthdate %>"
+      />
+      <%= data.birthdate %> <% if (errors.birthdate) { %>
+      <div class="error"><%= errors.birthdate.message %></div>
+      <% } %>
+    </div>
+    <div class="form-actions d-flex justify-content-start align-items-center">
+      <button
+        onclick="location.href='/users'"
+        type="button"
+        class="btn btn-danger"
+        style="margin-right: 20px"
+      >
+        cancel
+      </button>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+  </form>
+</div>
