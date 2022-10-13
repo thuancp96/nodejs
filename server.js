@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
+var cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const path = require("path");
+
 require("./api/db/mongodb/db").connect();
 
 require("dotenv").config();

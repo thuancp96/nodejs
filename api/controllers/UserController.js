@@ -5,12 +5,17 @@ var jwt = require("jsonwebtoken");
 
 module.exports = {
   loginForm: async (req, response) => {
+    var token = req?.cookies?.accessToken;
+    if (token) {
+      response.redirect("/");
+      return;
+    }
     try {
       response.render("components/login/index", {
         layout: "layouts/login-layout",
       });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   },
   register: async (req, response) => {
@@ -66,7 +71,7 @@ module.exports = {
 
       // Validate user input
       if (!(email && password)) {
-        res.status(400).send("All input is required");
+        res.status(400).send({ message: "All input is required" });
       }
       // Validate if user exist in our database
       const user = await userModel.findOne({ email });
@@ -83,15 +88,19 @@ module.exports = {
 
         // save user token
         user.token = token;
-        res.setHeader("Content-Type", "application/json");
         // user
         res.status(200).json(user);
         return;
       }
       res.status(400).send({ message: "Invalid Credentials" });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
+  },
+  logout: async (req, res) => {
+    res.clearCookie("accessToken");
+    res.redirect("/login");
+    res.end();
   },
   get: async (req, response) => {
     const users = await userModel.find({});

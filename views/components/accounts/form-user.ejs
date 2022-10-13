@@ -1,0 +1,70 @@
+<div class="form-add-users">
+  <div class="form-header">
+    <% if (Object.keys(errors).length === 0) { %>
+    <h2><%= data.type %> Account TVF</h2>
+    <% } else { %>
+    <h2 class="errors-heading">Oops, please correct the following:</h2>
+    <ul class="errors-list">
+      <% Object.values(errors).forEach(error => { %>
+      <li><%= error.message %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </div>
+
+  <form id="form-add-user" method="post" action="<%= data.url %> " novalidate>
+    <div class="form-field <%= errors.full_name ? 'form-field-invalid' : '' %>">
+      <label for="full_name">Full Name </label>
+      <input
+        class="input"
+        type="text"
+        id="full_name"
+        name="full_name"
+        value="<%= data?.accounts?.full_name %>"
+        autofocus
+      />
+      <% if (errors.full_name) { %>
+      <div class="error"><%= errors.full_name.message %></div>
+      <% } %>
+    </div>
+    <div class="form-field <%= errors.email ? 'form-field-invalid' : '' %>">
+      <label for="email">Email </label>
+      <input
+        class="input"
+        type="email"
+        id="email"
+        name="email"
+        value="<%= data?.accounts?.email %>"
+        autofocus
+      />
+      <% if (errors.email) { %>
+      <div class="error"><%= errors.email.message %></div>
+      <% } %>
+    </div>
+    <div class="form-field <%= errors.sdt ? 'form-field-invalid' : '' %>">
+      <label for="sdt">Sdt</label>
+      <input
+        class="input"
+        type="text"
+        id="sdt"
+        name="sdt"
+        autofocus
+        value="<%= data?.accounts?.sdt %>"
+      />
+      <%= data.sdt %> <% if (errors.sdt) { %>
+      <div class="error"><%= errors.sdt.message %></div>
+      <% } %>
+    </div>
+    <div class="form-actions d-flex justify-content-start align-items-center">
+      <button
+        onclick="location.href='/accounts'"
+        type="button"
+        class="btn btn-danger"
+        style="margin-right: 20px"
+      >
+        cancel
+      </button>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+  </form>
+</div>

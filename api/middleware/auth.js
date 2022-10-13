@@ -4,24 +4,37 @@ const config = process.env;
 
 const verifyToken = (req, res, next) => {
   // bearer token
-
-  const bearerHearder = req.headers["authorization"];
-  if (!bearerHearder) {
-    return res
-      .status(403)
-      .send({ message: "A token is required for authentication" });
-  }
-  const token = bearerHearder.split(" ")[1];
+  var token = req?.cookies?.accessToken;
   if (!token) {
-    return res
-      .status(403)
-      .send({ message: "A token is required for authentication" });
+    const bearerHearder = req.headers["authorization"];
+    if (!bearerHearder) {
+      res.render("components/login/index", {
+        layout: "./layouts/login-layout",
+      });
+      return;
+      // return res
+      //   .status(403)
+      //   .send({ message: "A token is required for authentication" });
+    }
+    token = bearerHearder.split(" ")[1];
+    if (!token) {
+      res.render("components/login/index", {
+        layout: "./layouts/login-layout",
+      });
+      return;
+      // return res
+      //   .status(403)
+      //   .send({ message: "A token is required for authentication" });
+    }
   }
+
   try {
     const decoded = jwt.verify(token, config.TOKEN_KEY);
     req.user = decoded;
   } catch (err) {
-    return res.status(401).send({ message: "Invalid Token" });
+    res.render("components/login/index", { layout: "./layouts/login-layout" });
+    return;
+    // return res.status(401).send({ message: "Invalid Token" });
   }
   return next();
 };

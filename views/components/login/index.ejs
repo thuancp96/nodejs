@@ -9,7 +9,7 @@
       </div>
 
       <form class="login100-form validate-form">
-        <span class="login100-form-title"> Member Login </span>
+        <span class="login100-form-title"> Admin Login </span>
 
         <div
           class="wrap-input100 validate-input"
@@ -20,6 +20,8 @@
             type="text"
             name="email"
             placeholder="Email"
+            id="email_login"
+            required
           />
           <span class="focus-input100"></span>
           <span class="symbol-input100">
@@ -36,15 +38,20 @@
             type="password"
             name="pass"
             placeholder="Password"
+            id="password_login"
+            required
           />
           <span class="focus-input100"></span>
           <span class="symbol-input100">
             <i class="fa fa-lock" aria-hidden="true"></i>
           </span>
         </div>
+        <div class="error error_login" style="margin: 10px; color: red"></div>
 
         <div class="container-login100-form-btn">
-          <button class="login100-form-btn">Login</button>
+          <button type="button" class="login100-form-btn" onclick="login()">
+            Login
+          </button>
         </div>
 
         <div class="text-center p-t-12">
@@ -62,3 +69,34 @@
     </div>
   </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  }
+
+  function login() {
+    $.ajax({
+      method: "POST",
+      url: "/login",
+      dataType: "json",
+      data: {
+        email: $("#email_login").val(),
+        password: $("#password_login").val(),
+      },
+    })
+      .done(function (data) {
+        if (data?._id) {
+          setCookie("accessToken", data?.token, 1);
+          window.location.href = "/";
+        }
+      })
+      .fail(function (msg) {
+        console.log(msg.responseJSON.message);
+        $(".error_login").text(msg.responseJSON.message);
+      });
+  }
+</script>
