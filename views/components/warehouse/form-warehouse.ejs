@@ -1,10 +1,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+<!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" /> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet" />
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css"
+  rel="stylesheet"
+/>
 
-
+<link href="/css/select.css" rel="stylesheet" />
 <script src="/js/app.js"></script>
 
 <div class="form-add-books">
@@ -16,16 +19,18 @@
     <div class="form-group">
       <label for="exampleFormControlSelect1">Sản Phẩm</label>
       <select
-      class="selectpicker form-control"
-        {{-- class="form-control"
-        id="exampleFormControlSelect1" --}}
+        class="selectpicker form-control"
+        {{--
+        class="form-control"
+        id="exampleFormControlSelect1"
+        --}}
         name="product_id"
         data-live-search="true"
       >
         <% data.products.forEach(function(product) { var selected =
         (data?.warehouse?.product_id.toString().trim() ==
-         product?.id.toString().trim()) ? 'selected' : ''; %>
-        <option value="<%= product._id %>" <%= selected %>
+        product?.id.toString().trim()) ? 'selected' : ''; %>
+        <option value="<%= product._id %>" <%="selected" %>
           ><%= product.name %>
         </option>
         <% }); %>
@@ -63,7 +68,7 @@
   </form>
 </div>
 <script>
-  $(function() {
-    $('.selectpicker').selectpicker();
+  $(function () {
+    $(".selectpicker").selectpicker();
   });
 </script>

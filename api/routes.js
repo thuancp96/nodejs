@@ -23,6 +23,8 @@ module.exports = function (app) {
   let userController = require("./controllers/UserController");
   let productController = require("./controllers/ProductsController");
   let warehouseController = require("./controllers/WareHouseController");
+  let orderController = require("./controllers/OrderController");
+
   app.use(expressLayouts);
 
   app.route("").get(auth, function (req, res) {
@@ -112,4 +114,15 @@ module.exports = function (app) {
     .route("/warehouses")
     .get(auth, warehouseController.get)
     .post(auth, warehouseController.store);
+
+  // ORDER
+  app.route("/add_order").get(auth, orderController.add);
+  app
+    .route("/orders")
+    .get(auth, orderController.get)
+    .post(auth, orderController.store);
+  app
+    .route("/orders/:orderId")
+    .get(auth, orderController.detail)
+    .post(auth, orderController.update);
 };
