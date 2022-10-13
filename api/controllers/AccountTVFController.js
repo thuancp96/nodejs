@@ -27,20 +27,32 @@ module.exports = {
     }
   },
   update: async (req, response) => {
-    const users = await userModel.updateOne(
-      { _id: req.params.userId },
-      { $set: req.body }
-    );
+    var full_name = req?.body?.full_name;
+    let account = "";
+    if (full_name) {
+      account = nameToNickName(full_name);
+    }
+    const body = { ...{ account: account }, ...req.body };
+
     try {
-      response.redirect("/users");
+      await userModel.updateOne({ _id: req.params.accountID }, { $set: body });
+      response.redirect("/accounts");
       // response.send(users);
     } catch (error) {
-      const user = await userModel.findOne({ _id: req.params.userId });
-      response.render("components/users/form-user", {
-        data: { type: "Edit", user: user, url: `/users/${user.id}` },
-        errors: users.errors,
-      });
-
+      let email = req?.body?.email;
+      const user = await userModel.findOne({ email });
+      if (user) {
+        const user = await userModel.findOne({ _id: req.params.accountID });
+        response.render("components/accounts/form-user", {
+          data: { type: "Edit", accounts: user, url: `/accounts/${user.id}` },
+          errors: {
+            email: {
+              message: "The specified email address is already in use.",
+            },
+          },
+        });
+        return;
+      }
       // response.status(500).send(error);
     }
   },
@@ -56,6 +68,21 @@ module.exports = {
     if (type == "web") {
       return;
     } else {
+      let email = request?.body?.email;
+      if (email) {
+        const user = await userModel.findOne({ email });
+        if (user) {
+          response.render("components/accounts/form-user", {
+            data: { type: "Create", accounts: body },
+            errors: {
+              email: {
+                message: "The specified email address is already in use.",
+              },
+            },
+          });
+          return;
+        }
+      }
       const user = new userModel(body);
 
       try {
@@ -63,7 +90,7 @@ module.exports = {
         response.redirect("/accounts");
       } catch (error) {
         response.render("components/accounts/form-user", {
-          data: { type: "Create" },
+          data: { type: "Create", accounts: body },
           errors: user.errors,
         });
       }

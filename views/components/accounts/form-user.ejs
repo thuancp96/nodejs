@@ -1,19 +1,12 @@
 <div class="form-add-users">
   <div class="form-header">
-    <% if (Object.keys(errors).length === 0) { %>
     <h2><%= data.type %> Account TVF</h2>
-    <% } else { %>
-    <h2 class="errors-heading">Oops, please correct the following:</h2>
-    <ul class="errors-list">
-      <% Object.values(errors).forEach(error => { %>
-      <li><%= error.message %></li>
-      <% }) %>
-    </ul>
-    <% } %>
   </div>
 
   <form id="form-add-user" method="post" action="<%= data.url %> " novalidate>
-    <div class="form-field <%= errors.full_name ? 'form-field-invalid' : '' %>">
+    <div
+      class="form-field <%= errors?.full_name ? 'form-field-invalid' : '' %>"
+    >
       <label for="full_name">Full Name </label>
       <input
         class="input"
@@ -23,7 +16,7 @@
         value="<%= data?.accounts?.full_name %>"
         autofocus
       />
-      <% if (errors.full_name) { %>
+      <% if (errors?.full_name) { %>
       <div class="error"><%= errors.full_name.message %></div>
       <% } %>
     </div>

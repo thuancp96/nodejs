@@ -45,6 +45,7 @@ label {
 .errors-list {
   font-size: 14px;
   color: #c00;
+  width: 100%;
 }
 .errors-list {
   margin: 0 0 1.5em;

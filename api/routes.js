@@ -76,5 +76,8 @@ module.exports = function (app) {
   app.route("/accounts").get(accountTVFController.get);
   app.route("/accounts/delete/:accountID").get(accountTVFController.delete);
   app.route("/accounts").post(accountTVFController.store);
-  app.route("/accounts/:accountID").get(accountTVFController.detail);
+  app
+    .route("/accounts/:accountID")
+    .get(accountTVFController.detail)
+    .post(accountTVFController.update);
 };
