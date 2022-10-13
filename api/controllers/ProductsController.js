@@ -1,46 +1,74 @@
 "use strict";
 
-const util = require("util");
-const mysql = require("mysql");
-const db = require("./../db");
+const productModel = require("../models/product");
 
 module.exports = {
-  get: (req, res) => {
-    let sql = "SELECT * FROM products";
-    db.query(sql, (err, response) => {
-      if (err) throw err;
-      res.json(response);
-    });
+  get: async (req, res) => {
+    const products = await productModel.find({});
+    res.render("components/product/index", { products: products });
+    return;
   },
-  detail: (req, res) => {
-    let sql = "SELECT * FROM products WHERE id = ?";
-    db.query(sql, [req.params.productId], (err, response) => {
-      if (err) throw err;
-      res.json(response[0]);
-    });
+  detail: async (req, res) => {
+    const product = await productModel.findOne({ _id: req.params.productID });
+    try {
+      res.render("components/product/form-product", {
+        data: {
+          type: "Cập nhật",
+          product: product,
+          url: `/products/${product.id}`,
+        },
+        errors: {},
+      });
+    } catch (error) {
+      res.status(500).send(error);
+    }
   },
-  update: (req, res) => {
-    let data = req.body;
-    let productId = req.params.productId;
-    let sql = "UPDATE products SET ? WHERE id = ?";
-    db.query(sql, [data, productId], (err, response) => {
-      if (err) throw err;
-      res.json({ message: "Update success!" });
-    });
+  update: async (req, res) => {
+    let body = req.body;
+    if (req?.file) {
+      body = {
+        ...{ image: "/uploads/" + req?.file?.filename },
+        ...req.body,
+      };
+    }
+    const product = await productModel.updateOne(
+      { _id: req.params.productID },
+      { $set: body }
+    );
+    try {
+      res.redirect("/products");
+    } catch (error) {
+      res.render("components/product/form-product", {
+        data: { type: "Edit", url: `/products/${product.id}` },
+        errors: product.errors,
+      });
+    }
   },
-  store: (req, res) => {
-    let data = req.body;
-    let sql = "INSERT INTO products SET ?";
-    db.query(sql, [data], (err, response) => {
-      if (err) throw err;
-      res.json({ message: "Insert success!" });
-    });
+  store: async (req, res) => {
+    let product = {
+      ...{
+        image: req?.file?.filename ? "/uploads/" + req?.file?.filename : "",
+      },
+      ...req.body,
+    };
+    const product_created = new productModel(product);
+
+    try {
+      await product_created.save();
+      res.redirect("/products");
+    } catch (error) {
+      res.render("components/product/form-product", {
+        data: { type: "Create", product: req?.body },
+        errors: product_created.errors,
+      });
+    }
   },
-  delete: (req, res) => {
-    let sql = "DELETE FROM products WHERE id = ?";
-    db.query(sql, [req.params.productId], (err, response) => {
-      if (err) throw err;
-      res.json({ message: "Delete success!" });
-    });
+  delete: async (req, res) => {
+    try {
+      await productModel.deleteOne({ _id: req.params.productID });
+      res.redirect("/products");
+    } catch (error) {
+      res.status(500).send(error);
+    }
   },
 };

@@ -1,0 +1,122 @@
+<script
+  class="jsbin"
+  src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"
+></script>
+<script
+  class="jsbin"
+  src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"
+></script>
+<script src="/js/app.js"></script>
+
+<div class="form-add-books">
+  <div class="form-header">
+    <h2><%= data.type %> sản phẩm</h2>
+  </div>
+
+  <form
+    id="form-add-user"
+    method="post"
+    action="<%= data.url %> "
+    enctype="multipart/form-data"
+  >
+    <div class="form-field <%= errors.name ? 'form-field-invalid' : '' %>">
+      <label for="name">Tên sản phẩm </label>
+      <input
+        class="input"
+        type="text"
+        id="name"
+        name="name"
+        value="<%= data?.product?.name %>"
+        autofocus
+      />
+      <% if (errors.name) { %>
+      <div class="error"><%= errors.name.message %></div>
+      <% } %>
+    </div>
+    <div
+      class="form-field <%= errors.description ? 'form-field-invalid' : '' %>"
+    >
+      <div class="form-group">
+        <label for="exampleFormControlTextarea1">Mô tả</label>
+        <textarea
+          class="form-control"
+          id="exampleFormControlTextarea1"
+          rows="3"
+          name="description"
+        >
+        <%= data?.product?.description %>
+      </textarea
+        >
+      </div>
+      <% if (errors.description) { %>
+      <div class="error"><%= errors.description.message %></div>
+      <% } %>
+    </div>
+
+    <div class="form-field <%= errors.buy_price ? 'form-field-invalid' : '' %>">
+      <label for="buy_price">Giá mua </label>
+      <input
+        class="input"
+        type="number"
+        id="buy_price"
+        name="buy_price"
+        value="<%= data?.product?.buy_price %>"
+        autofocus
+      />
+      <%= data.buy_price %> <% if (errors.buy_price) { %>
+      <div class="error"><%= errors.buy_price.message %></div>
+      <% } %>
+    </div>
+    <div
+      class="form-field <%= errors.sell_price ? 'form-field-invalid' : '' %>"
+    >
+      <label for="sell_price">Giá bán </label>
+      <input
+        class="input"
+        type="number"
+        id="sell_price"
+        name="sell_price"
+        value="<%= data?.product?.sell_price %>"
+        autofocus
+      />
+      <% if (errors.sell_price) { %>
+      <div class="error"><%= errors.sell_price.message %></div>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <img id="blah" src="<%= data?.product?.image %>" width="200" />
+      <label for="exampleFormControlFile1">Ảnh</label>
+      <input
+        type="file"
+        class="form-control-file"
+        name="image"
+        onchange="readURL(this);"
+      />
+    </div>
+
+    <script type="text/javascript">
+      function readURL(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            $("#blah").attr("src", e.target.result);
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+    </script>
+
+    <div class="form-actions d-flex justify-content-start align-items-center">
+      <button
+        onclick="location.href='/products'"
+        type="button"
+        class="btn btn-danger"
+        style="margin-right: 20px"
+      >
+        cancel
+      </button>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+  </form>
+</div>

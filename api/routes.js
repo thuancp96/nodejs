@@ -19,8 +19,10 @@ var upload = multer({ storage: storage }).single("image");
 module.exports = function (app) {
   let accountTVFController = require("./controllers/AccountTVFController");
   let authorController = require("./controllers/AuthorController");
-  let bookController = require("./controllers/BookController");
+  // let bookController = require("./controllers/BookController");
   let userController = require("./controllers/UserController");
+  let productController = require("./controllers/ProductsController");
+  let warehouseController = require("./controllers/WareHouseController");
   app.use(expressLayouts);
 
   app.route("").get(auth, function (req, res) {
@@ -46,10 +48,13 @@ module.exports = function (app) {
       errors: {},
     });
   });
-  app.route("/users").get(authorController.get).post(authorController.store);
-  app.route("/users/delete/:userId").get(authorController.delete);
-  app.route("/users/:userId").post(authorController.update);
-  app.route("/users/:userId").get(authorController.detail);
+  app
+    .route("/users")
+    .get(auth, authorController.get)
+    .post(auth, authorController.store);
+  app.route("/users/delete/:userId").get(auth, authorController.delete);
+  app.route("/users/:userId").post(auth, authorController.update);
+  app.route("/users/:userId").get(auth, authorController.detail);
   // .put(userController.update)
   // .delete(userController.delete);
 
@@ -67,17 +72,44 @@ module.exports = function (app) {
   //   .post(upload, bookController.update);
 
   // MANAGER ACCOUNT TVF
-  app.route("/add_accounts").get(function (req, res) {
+  app.route("/add_accounts").get(auth, function (req, res) {
     res.render("components/accounts/form-user", {
       data: { type: "Create", url: "/accounts" },
       errors: {},
     });
   });
-  app.route("/accounts").get(accountTVFController.get);
-  app.route("/accounts/delete/:accountID").get(accountTVFController.delete);
-  app.route("/accounts").post(accountTVFController.store);
+  app.route("/accounts").get(auth, accountTVFController.get);
+  app
+    .route("/accounts/delete/:accountID")
+    .get(auth, accountTVFController.delete);
+  app.route("/accounts").post(auth, accountTVFController.store);
   app
     .route("/accounts/:accountID")
-    .get(accountTVFController.detail)
-    .post(accountTVFController.update);
+    .get(auth, accountTVFController.detail)
+    .post(auth, accountTVFController.update);
+
+  // PRODUCT
+  app.route("/add_product").get(auth, function (req, res) {
+    res.render("components/product/form-product", {
+      data: { type: "Tạo mới", url: "/products" },
+      errors: {},
+    });
+  });
+  app
+    .route("/products")
+    .get(auth, productController.get)
+    .post(auth, upload, productController.store);
+  app.route("/products/delete/:productID").get(auth, productController.delete);
+  app
+    .route("/products/:productID")
+    .get(auth, productController.detail)
+    .post(auth, upload, productController.update);
+
+  // Warehouse
+
+  app.route("/add_warehouse").get(auth, warehouseController.add);
+  app
+    .route("/warehouses")
+    .get(auth, warehouseController.get)
+    .post(auth, warehouseController.store);
 };
