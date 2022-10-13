@@ -19,4 +19,4 @@ const userSchema = new mongoose.Schema({
   account: { type: String, required: true },
 });
 
-module.exports = mongoose.model("account_tvf", userSchema);
+module.exports = mongoose.model("account_tvfs", userSchema);

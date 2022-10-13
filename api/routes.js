@@ -125,4 +125,7 @@ module.exports = function (app) {
     .route("/orders/:orderId")
     .get(auth, orderController.detail)
     .post(auth, orderController.update);
+  app.route("/orders/delete/:orderId").get(auth, orderController.delete);
+  // EXPORT EXCEL
+  app.route("/exports").get(auth, orderController.exports);
 };

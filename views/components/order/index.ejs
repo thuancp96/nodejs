@@ -48,13 +48,13 @@
                 >
                   Edit
                 </button>
-                <!-- <button
+                <button
                   onclick="deletePR('<%= order._id %>')"
                   type="button"
                   class="btn btn-danger"
                 >
                   Remove
-                </button> -->
+                </button>
               </td>
             </tr>
             <% }); %>
@@ -64,10 +64,10 @@
     </div>
   </div>
 </div>
-<!-- <script type="text/javascript">
+<script type="text/javascript">
   function deletePR(id_product) {
     if (confirm("are you sure?")) {
-      window.location.href = `/products/delete/${id_product}`;
+      window.location.href = `/orders/delete/${id_product}`;
     }
   }
-</script> -->
+</script>

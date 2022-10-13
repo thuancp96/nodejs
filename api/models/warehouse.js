@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     ref: "products",
   },
   buy_quality: { type: Number, required: [true, "Số lượng nhập vào bắt buộc"] },
-  remaining_quality: { type: Number, required: true },
+  remaining_quality: { type: Number, required: true, min: 0 },
   total_quality: { type: Number, required: true },
 });
 
