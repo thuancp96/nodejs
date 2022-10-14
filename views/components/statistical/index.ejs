@@ -73,6 +73,7 @@
       >
         <thead>
           <tr>
+            <th>Thời gian xuất file</th>
             <th>Ngày bắt đầu</th>
             <th>Ngày kết thúc</th>
             <th style="max-width: 150px">action</th>
@@ -81,6 +82,7 @@
         <tbody>
           <% data.statistical.forEach(function(item) { %>
           <tr>
+            <td><%= item.date %></td>
             <td><%= item.start_date %></td>
             <td><%= item.end_date %></td>
             <td>
@@ -91,6 +93,13 @@
               >
                 Tải
               </button>
+              <button
+                onclick="deletePR('<%= item._id %>')"
+                type="button"
+                class="btn btn-danger"
+              >
+                Remove
+              </button>
             </td>
           </tr>
           <% }); %>
@@ -100,6 +109,12 @@
   </div>
 </div>
 <script>
+  function deletePR(_id) {
+    if (confirm("are you sure?")) {
+      window.location.href = `/statistical/delete/${_id}`;
+    }
+  }
+
   function DownloadFile(url) {
     var arrFile = url.split("/");
     var fileName = arrFile[arrFile.length - 1];

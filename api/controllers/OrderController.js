@@ -7,6 +7,8 @@ const warehouseModel = require("../models/warehouse");
 const statisticalModel = require("../models/statistical");
 const moment = require("moment");
 const excelJS = require("exceljs");
+const crypto = require("crypto");
+var fs = require("fs");
 
 module.exports = {
   get: async (req, res) => {
@@ -255,6 +257,18 @@ module.exports = {
       res.status(500).send(error);
     }
   },
+  remove: async (req, res) => {
+    let file = await statisticalModel.findOne({ _id: req.params.id });
+    if (file?.link) {
+      fs.unlink("public" + file.link, function (err) {});
+    }
+    try {
+      await statisticalModel.deleteOne({ _id: req.params.id });
+      res.redirect("/statistical");
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  },
   exports: async (req, res) => {
     let start_date = req.body?.start_date;
     let end_date = req.body?.end_date;
@@ -291,8 +305,8 @@ module.exports = {
       });
       return;
     }
-
-    const name_file = `Orders_${start_date}-${end_date}`;
+    var timestamp = crypto.randomBytes(5).toString("hex");
+    const name_file = `Orders_${start_date}-${end_date}-${timestamp}`;
 
     try {
       const workbook = new excelJS.Workbook(); // Create a new workbook
@@ -322,7 +336,7 @@ module.exports = {
       const aggregation = [
         {
           $match: {
-            date: { $gte: new Date("2022-10-01"), $lt: new Date("2022-10-30") },
+            date: { $gte: new Date(start_date), $lt: new Date(end_date) },
           },
         },
         {
@@ -407,11 +421,13 @@ module.exports = {
               start_date: start_date,
               end_date: end_date,
               link: link,
+              date: moment().format("YYYY-MM-DD"),
             };
             const exports_done = new statisticalModel(body);
             await exports_done.save();
             res.redirect("/statistical");
           });
+        return;
       } catch (err) {
         console.log(err);
         res.send({

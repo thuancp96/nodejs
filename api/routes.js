@@ -132,6 +132,7 @@ module.exports = function (app) {
     res.redirect("/statistical");
   });
   app.route("/statistical").get(auth, orderController.statistical);
+  app.route("/statistical/delete/:id").get(auth, orderController.remove);
 
   // API
   app.route("/all-user").get(auth, accountTVFController.index);
