@@ -4,6 +4,7 @@ const orderModel = require("../models/order");
 const userModel = require("../models/account_tvf");
 const productModel = require("../models/product");
 const warehouseModel = require("../models/warehouse");
+const statisticalModel = require("../models/statistical");
 const moment = require("moment");
 const excelJS = require("exceljs");
 
@@ -14,6 +15,14 @@ module.exports = {
       .populate("product")
       .populate("user");
     res.render("components/order/index", { orders: orders });
+  },
+  statistical: async (req, res) => {
+    const statistical = await statisticalModel.find({});
+    res.render("components/statistical/index", {
+      data: { type: "Thống Kê", url: "/exports", statistical: statistical },
+      errors: {},
+    });
+    return;
   },
   add: async (req, res) => {
     const products = await productModel.find({});
@@ -190,6 +199,54 @@ module.exports = {
       });
     }
   },
+  order: async (req, res) => {
+    let time = moment().format("h:mm:ss a MM/DD/YYYY");
+    let body = {
+      ...{
+        date: time,
+      },
+      ...req.body,
+    };
+
+    if (!req.body.product || !req.body.user) {
+      res.status(500).send({ message: "Vui lòng nhập đủ thông tin." });
+    }
+
+    if (req.body?.quality) {
+      let product_order = await warehouseModel.findOne({
+        product_id: req.body.product,
+      });
+      if (
+        parseInt(product_order.remaining_quality) < parseInt(req.body?.quality)
+      ) {
+        res
+          .status(500)
+          .send({ message: "Số lượng còn lại trong kho không đủ." });
+      } else {
+        let body = {
+          remaining_quality:
+            parseInt(product_order.remaining_quality) -
+            parseInt(req.body.quality),
+          total_quality: product_order.total_quality,
+          buy_quality: product_order.buy_quality,
+          product_id: product_order.product_id,
+        };
+
+        await warehouseModel.updateOne(
+          { _id: product_order.id },
+          { $set: body }
+        );
+      }
+    }
+
+    const product_created = new orderModel(body);
+    try {
+      await product_created.save();
+      res.send({ message: "successfully", data: product_created });
+    } catch (error) {
+      res.status(500).send(product_created.errors);
+    }
+  },
   delete: async (req, res) => {
     try {
       await orderModel.deleteOne({ _id: req.params.orderId });
@@ -199,38 +256,68 @@ module.exports = {
     }
   },
   exports: async (req, res) => {
-    var fullUrl = req.protocol + "://" + req.get("host");
+    let start_date = req.body?.start_date;
+    let end_date = req.body?.end_date;
+    const statistical = await statisticalModel.find({});
+    if (!moment(start_date, "YYYY-MM-DD", true).isValid()) {
+      res.render("components/statistical/index", {
+        data: {
+          type: "Thống Kê ",
+          date: req.body,
+          url: "/exports",
+          statistical: statistical,
+        },
+        errors: {
+          start_date: {
+            message: "Ngày bắt đầu không đúng định dạng YYYY-MM-DD",
+          },
+        },
+      });
+      return;
+    }
+    if (!moment(end_date, "YYYY-MM-DD", true).isValid()) {
+      res.render("components/statistical/index", {
+        data: {
+          type: "Thống Kê ",
+          date: req.body,
+          statistical: statistical,
+          url: "/exports",
+        },
+        errors: {
+          end_date: {
+            message: "Ngày kết thúc không đúng định dạng YYYY-MM-DD",
+          },
+        },
+      });
+      return;
+    }
+
+    const name_file = `Orders_${start_date}-${end_date}`;
+
     try {
       const workbook = new excelJS.Workbook(); // Create a new workbook
-      const worksheet = workbook.addWorksheet("Orders"); // New Worksheet
+      const worksheet = workbook.addWorksheet(name_file); // New Worksheet
       const path = "./public/files"; // Path to download excel
       // Column for data in excel. key must match data key
-      const sheetColumns = [{ header: "S no.", key: "full_name", width: 10 }];
+      const sheetColumns = [
+        { header: "Họ và Tên.", key: "full_name", width: 30 },
+      ];
 
       const listProducts = await productModel.find({});
       listProducts.forEach((product) => {
         sheetColumns.push({
           header: product.name,
           key: "key_" + product.id.toString().trim(),
-          width: 30,
+          width: 20,
         });
       });
       sheetColumns.push({
         header: "Total",
         key: "total_month",
-        width: 30,
+        width: 20,
       });
 
       worksheet.columns = sheetColumns;
-
-      // worksheet.columns = [
-      //   { header: "S no.", key: "s_no", width: 10 },
-      //   { header: "full name", key: "full_name", width: 10 },
-      //   { header: "email", key: "email", width: 10 },
-      //   { header: "sdt", key: "sdt", width: 10 },
-      //   { header: "account", key: "account", width: 10 },
-      // ];
-      // Looping through User data
 
       const aggregation = [
         {
@@ -312,13 +399,18 @@ module.exports = {
       });
       try {
         const data = await workbook.xlsx
-          .writeFile(`${path}/orders.xlsx`)
-          .then(() => {
-            res.send({
-              status: "success",
-              message: "file successfully downloaded",
-              path: `/files/orders.xlsx`,
-            });
+          .writeFile(`${path}/${name_file}.xlsx`)
+          .then(async () => {
+            const link = `/files/${name_file}.xlsx`;
+
+            const body = {
+              start_date: start_date,
+              end_date: end_date,
+              link: link,
+            };
+            const exports_done = new statisticalModel(body);
+            await exports_done.save();
+            res.redirect("/statistical");
           });
       } catch (err) {
         console.log(err);

@@ -2,6 +2,14 @@
 const userModel = require("../models/account_tvf");
 
 module.exports = {
+  index: async (req, response) => {
+    const accounts = await userModel.find({});
+    try {
+      response.send(accounts);
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  },
   get: async (req, response) => {
     const accounts = await userModel.find({});
     const type = req?.query?.type;

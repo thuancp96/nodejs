@@ -1,0 +1,134 @@
+<script
+  class="jsbin"
+  src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"
+></script>
+<script
+  class="jsbin"
+  src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"
+></script>
+<script src="/js/app.js"></script>
+
+<div class="form-add-books">
+  <div class="form-header">
+    <h2><%= data.type %></h2>
+  </div>
+
+  <form
+    id="form-add-export"
+    class="d-flex justify-content-start align-items-center"
+    method="POST"
+    action="<%= data.url %>"
+  >
+    <div
+      class="form-field <%= errors.start_date ? 'form-field-invalid' : '' %> m-4"
+    >
+      <label for="start_date">Ngày bắt đầu </label>
+      <input
+        class="input"
+        type="text"
+        id="start_date"
+        name="start_date"
+        value="<%= data?.date?.start_date %>"
+        autofocus
+        placeholder="YYYY-MM-DD"
+      />
+      <% if (errors.start_date) { %>
+      <div class="error"><%= errors.start_date.message %></div>
+      <% } %>
+    </div>
+
+    <div
+      class="form-field <%= errors.end_date ? 'form-field-invalid' : '' %> m-4"
+    >
+      <label for="end_date">Ngày kết thúc </label>
+      <input
+        class="input"
+        type="text"
+        id="end_date"
+        name="end_date"
+        value="<%= data?.date?.end_date %>"
+        autofocus
+        placeholder="YYYY-MM-DD"
+      />
+      <% if (errors.end_date) { %>
+      <div class="error"><%= errors.end_date.message %></div>
+      <% } %>
+    </div>
+
+    <div
+      class="form-actions d-flex justify-content-start align-items-center"
+      style="margin-top: 11px"
+    >
+      <button class="btn btn-primary" type="submit">Export</button>
+    </div>
+  </form>
+
+  <div class="card-body">
+    <div class="table-responsive">
+      <table
+        class="table table-bordered"
+        id="dataTable"
+        width="100%"
+        cellspacing="0"
+      >
+        <thead>
+          <tr>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
+            <th style="max-width: 150px">action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.statistical.forEach(function(item) { %>
+          <tr>
+            <td><%= item.start_date %></td>
+            <td><%= item.end_date %></td>
+            <td>
+              <button
+                onclick="DownloadFile('<%= item.link %>')"
+                type="button"
+                class="btn btn-info"
+              >
+                Tải
+              </button>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  function DownloadFile(url) {
+    var arrFile = url.split("/");
+    var fileName = arrFile[arrFile.length - 1];
+    //Set the File URL.
+    //Create XMLHTTP Request.
+    var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.responseType = "blob";
+    req.onload = function () {
+      //Convert the Byte Data to BLOB object.
+      var blob = new Blob([req.response], {
+        type: "application/octetstream",
+      });
+
+      //Check the Browser type and download the File.
+      var isIE = false || !!document.documentMode;
+      if (isIE) {
+        window.navigator.msSaveBlob(blob, fileName);
+      } else {
+        var url = window.URL || window.webkitURL;
+        link = url.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.setAttribute("download", fileName);
+        a.setAttribute("href", link);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    };
+    req.send();
+  }
+</script>

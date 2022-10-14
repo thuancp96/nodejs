@@ -127,5 +127,14 @@ module.exports = function (app) {
     .post(auth, orderController.update);
   app.route("/orders/delete/:orderId").get(auth, orderController.delete);
   // EXPORT EXCEL
-  app.route("/exports").get(auth, orderController.exports);
+  app.route("/exports").post(auth, orderController.exports);
+  app.route("/exports").get(auth, function (req, res) {
+    res.redirect("/statistical");
+  });
+  app.route("/statistical").get(auth, orderController.statistical);
+
+  // API
+  app.route("/all-user").get(auth, accountTVFController.index);
+  app.route("/all-product").get(auth, productController.index);
+  app.route("/order").post(auth, orderController.order);
 };

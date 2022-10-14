@@ -3,6 +3,10 @@
 const productModel = require("../models/product");
 
 module.exports = {
+  index: async (req, res) => {
+    const products = await productModel.find({});
+    res.send(products);
+  },
   get: async (req, res) => {
     const products = await productModel.find({});
     res.render("components/product/index", { products: products });

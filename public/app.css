@@ -91,3 +91,7 @@ label {
 .bootstrap-select .dropdown-toggle::after {
   content: unset !important;
 }
+#form-add-export .form-field {
+  min-height: 94px;
+  min-width: 322px;
+}
