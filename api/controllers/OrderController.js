@@ -273,6 +273,8 @@ module.exports = {
     let start_date = req.body?.start_date;
     let end_date = req.body?.end_date;
     const statistical = await statisticalModel.find({});
+    // console.log(req.body);
+    // return;
     if (!moment(start_date, "YYYY-MM-DD", true).isValid()) {
       res.render("components/statistical/index", {
         data: {
@@ -283,7 +285,7 @@ module.exports = {
         },
         errors: {
           start_date: {
-            message: "Ngày bắt đầu không đúng định dạng YYYY-MM-DD",
+            message: "Ngày bắt đầu là bắt buộc",
           },
         },
       });
@@ -299,7 +301,7 @@ module.exports = {
         },
         errors: {
           end_date: {
-            message: "Ngày kết thúc không đúng định dạng YYYY-MM-DD",
+            message: "Ngày kết thúc là bắt buộc",
           },
         },
       });
