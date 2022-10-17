@@ -120,7 +120,7 @@ module.exports = function (app) {
   app
     .route("/orders")
     .get(auth, orderController.get)
-    .post(auth, orderController.store);
+    .post(orderController.store);
   app
     .route("/orders/:orderId")
     .get(auth, orderController.detail)
